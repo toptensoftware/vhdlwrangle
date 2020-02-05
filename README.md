@@ -1,65 +1,96 @@
-# vhdlwrangle README
+# vhdlwrangle 
 
-This is the README for your extension "vhdlwrangle". After writing up a brief description, we recommend including the following sections.
+VHDL Wrangle is a simple VS Code extension for wrangling with VHDL code.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+VHDL Wrangle can:
 
-For example if there is an image subfolder under your extension project workspace:
+* Convert VHDL entity declarations into instances
+* Convert VHDL port declarations into signals
 
-\!\[feature X\]\(images/feature-x.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Usage
 
-## Requirements
+To convert a VHDL entity declaration into a instance:
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. Select the entity declaration (usually you'll copy/paste it from the entity's implementation file and paste it where you want the instance).
+2. Invoke the vhdlwrangle.convertEntityDeclToInstance command.  ie: Ctrl+Shift+P -> Convert VHDL Entity Declaration to Instance
 
-## Extension Settings
+eg: Before:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+```
+entity ClockDivider is
+generic
+(
+    p_period : integer                  -- Period of the clock enable (in clock cycles)
+);
+port 
+( 
+    -- Control
+    i_clock : in std_logic;             -- Clock
+    i_clken : in std_logic;             -- Clock Enable for clock being divided
+    i_reset : in std_logic;             -- Reset (synchronous, active high)
+    
+    -- Output
+    o_clken : out std_logic             -- Generated clock enable signal
+);
+end ClockDivider;
+```
 
-For example:
+After:
+```
+	e_ClockDivider : entity work.ClockDivider
+	generic map
+	(
+		p_period => p_period
+	)
+	port map
+	(
+		i_clock => s_clock,
+		i_clken => s_clken,
+		i_reset => s_reset,
+		o_clken => s_clken
+	);
+```
 
-This extension contributes the following settings:
+To convert a VHDL port declarations to signal declarations:
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+1. Select the port declarations to be converted (again you'll probably copy/paste these from elsewhere)
+2. Invoke the vhdlwrangle.convertPortDeclsToSignals command.  ie: Ctrl+Shift+P -> Convert VHDL Port Declarations to Signals
+
+eg: Before
+
+```
+    -- Control
+    i_clock : in std_logic;             -- Clock
+    i_clken : in std_logic;             -- Clock Enable for clock being divided
+    i_reset : in std_logic;             -- Reset (synchronous, active high)
+    
+    -- Output
+    o_clken : out std_logic             -- Generated clock enable signal
+```
+
+After:
+
+```
+	signal s_clock : std_logic;
+	signal s_clken : std_logic;
+	signal s_reset : std_logic;
+	signal s_clken : std_logic;
+```
+
+
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+None known, probably many unknown :)
 
 ## Release Notes
 
-Users appreciate release notes as you update your extension.
 
 ### 1.0.0
 
-Initial release of ...
+Initial release!
 
-### 1.0.1
 
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
