@@ -1,3 +1,4 @@
+let textUtils = require('./textUtils')
 
 // Tokenizes a string into an expression tokens.
 // Returns a function that each time called, returns the next token
@@ -15,34 +16,34 @@ function tokenize(strIn)
         while (true)
         {
             // Skip leading line space
-            while (isWhitespace(str[p]))
+            while (textUtils.isWhitespace(str[p]))
                 p++;
 
             // Comment
             if (str[p] == '-' && str[p+1] == '-')
             {
-                p = findNextLine(str, p);
+                p = textUtils.findNextLine(str, p);
                 continue;
             }
             break;
         }
         if (p > save && whitespaceMode)
         {
-            return { token: " " };
+            return { pos: save, token: " " };
         }
 
         // Eof of file?
         if (str[p]=='\0' || p==str.length)
         {
-            return { token: 'eof' }
+            return { pos: p, token: 'eof' }
         }
 
         // Is it an identifier?
-        if (isIdentifierLeadChar(str[p]))
+        if (textUtils.isIdentifierLeadChar(str[p]))
         {
             // Skip it
             let start = p;
-            while (isIdentifierChar(str[p]))
+            while (textUtils.isIdentifierChar(str[p]))
                 p++;
 
             // Extract it
@@ -50,6 +51,7 @@ function tokenize(strIn)
 
             // Return token
             return {
+                pos: start,
                 token: 'identifier',
                 value: identifier,
             }
@@ -62,9 +64,11 @@ function tokenize(strIn)
             case ')':
             case ',':
             case ';':
+            case '.':
                 let ch = str[p];
                 p++;
                 return {
+                    pos: p-1,
                     token: ch
                 }
 
@@ -73,11 +77,28 @@ function tokenize(strIn)
                 if (str[p] == '=')
                 {
                     p++;
-                    return { token: ":=" }
+                    return { pos: p-2, token: ":="}
                 }
-                return { token: ":" }
+                return { pos: p-1, token: ":" }
 
-        }
+            case '<':
+                p++;
+                if (str[p] == '=')
+                {
+                    p++;
+                    return { pos: p-2, token: "<="}
+                }
+                return { pos: p-1, token: ":" }
+
+            case '=':
+                p++;
+                if (str[p] == '>')
+                {
+                    p++;
+                    return { pos: p-2, token: "=>"}
+                }
+                return { pos: p-1, token: "=" }
+            }
 
         // String?
         if (str[p] == '\"' || str[p] == '\'')
@@ -102,6 +123,7 @@ function tokenize(strIn)
 
             // Return as a literal
             return {
+                pos: start,
                 token: 'other',
                 raw
             }
@@ -110,6 +132,7 @@ function tokenize(strIn)
         // Some other unexpected character
         p++;
         return {
+            pos: p-1,
             token: 'other',
             raw: str[p-1]
         }
@@ -121,55 +144,6 @@ function tokenize(strIn)
     }
 
     return next;
-}
-
-// Check if whitespace
-function isWhitespace(char)
-{
-    return char == ' ' || char == '\t' || char == '\r' || char == '\n';
-}
-
-// Find the end of a line, returns new position
-function findEol(str, p)
-{
-    while (p < str.length && str[p] != '\0' && str[p] != '\n' && str[p] != '\r')
-        p++;
-    return p;
-}
-
-// Find the next line, returns new position
-function findNextLine(str, p)
-{
-    p = findEol(str, p);
-    if (str[p] == '\r')
-        p++;
-    if (str[p] == '\n')
-        p++;
-    return p;
-}
-
-// Is character a digit?
-function isDigit(ch)
-{
-    return ch >= '0' && ch <= '9';
-}
-
-// Is character a letter?
-function isLetter(ch)
-{
-    return (ch>='a' && ch <='z') || (ch >= 'A' && ch <= 'Z')
-}
-
-// Is character a valid identifier character
-function isIdentifierChar(ch)
-{
-    return isDigit(ch) || isLetter(ch) || ch == '_';
-}
-
-// Is character a valad leading identifier character
-function isIdentifierLeadChar(ch)
-{
-    return isLetter(ch) || ch == '_';
 }
 
 

@@ -1,7 +1,7 @@
 function renderEntityInstance(decl)
 {
     let str = "";
-    str += `\te_${decl.entityName} : entity work.${decl.entityName}\n`;
+    str += `\te_${decl.name} : entity work.${decl.name}\n`;
     if (decl.genericDecls) {
         str += `\tgeneric map\n`;
         str += `\t(\n`;

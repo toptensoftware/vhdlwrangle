@@ -4,6 +4,7 @@ const vscode = require('vscode');
 const tokenizer = require('./tokenizer');
 const parser = require('./parser');
 const renderer = require('./renderer');
+const VhdlDefinitionProvider = require('./VhdlDefinitionProvider');
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -13,9 +14,10 @@ const renderer = require('./renderer');
  */
 function activate(context) {
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vhdlwrangle" is now active!');
+	// Register definitino provider
+	context.subscriptions.push(
+		vscode.languages.registerDefinitionProvider({ scheme: 'file', language: 'vhdl' }, new VhdlDefinitionProvider())
+	);
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with  registerCommand
@@ -98,7 +100,6 @@ function activate(context) {
 	});
 
 	context.subscriptions.push(disposable);
-
 }
 exports.activate = activate;
 

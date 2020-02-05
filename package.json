@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onCommand:vhdlwrangle.convertEntityDeclToInstance",
-		"onCommand:vhdlwrangle.convertPortDeclsToSignals"
+		"onCommand:vhdlwrangle.convertPortDeclsToSignals",
+		"onLanguage:vhdl"
 	],
 	"main": "./extension.js",
 	"contributes": {
@@ -24,7 +25,17 @@
 				"command": "vhdlwrangle.convertPortDeclsToSignals",
 				"title": "Convert VHDL Port Declarations to Signals"
 			}
-		]
+		],
+		"languages": [{
+			"id": "vhdl",
+			"extensions": [ ".vhdl", ".vhd" ],
+			"aliases": [ "VHDL"]
+		}],
+        "grammars": [{
+            "language": "vhdl",
+            "scopeName": "source.vhdl",
+            "path": "./vhdl.tmLanguage"
+        }],
 	},
 	"scripts": {
 		"lint": "eslint .",

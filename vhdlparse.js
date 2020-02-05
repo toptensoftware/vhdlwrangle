@@ -2,25 +2,18 @@ let fs = require('fs');
 let tokenizer = require('./tokenizer');
 let parser = require('./parser');
 let renderer = require('./renderer');
+let lineOffsets = require('./lineOffsets');
+let navigate = require('./navigate');
+let textUtils = require('./textUtils');
 
 let vhdl = fs.readFileSync("C:\\Users\\Brad\\Downloads\\UartRxBuffered.vhd", "utf8");
 
-// Find the "entity" declaration
-let entityMatch = vhdl.match(/ENTITY\s/i);
-if (!entityMatch)
-    throw new Error("Entity declarations not found");
 
-// Strip off everything before the entity declaration
-let nextToken = tokenizer(vhdl.substr(entityMatch.index));
-let decl = parser(nextToken).parseEntityDecl();
-let str = renderer.renderEntityInstance(decl);
+console.log(textUtils.extractIdentifier(vhdl, 440));
 
-console.log(str);
+let ast = parser(tokenizer(vhdl)).parseDocument();
+console.log(JSON.stringify(ast, 0, 4));
 
-/*
-let nextToken = tokenizer(vhdl);
-let decls = parser(nextToken).parsePortDecls();
+let element = navigate.findElementAtPosition(ast, 2510);
 
-let str = renderer.renderSignalDeclarations(decls);
-console.log(str);
-*/
+console.log(JSON.stringify(element, 0, 4));
