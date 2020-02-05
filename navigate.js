@@ -1,22 +1,30 @@
+// Check if element contains the specified position
 function doesContain(element, pos)
 {
+    // If it's a block element it'll have a start and end position
     if (element.pos && element.endPos)
     {
         return pos >= element.pos && pos < element.endPos;
     }
 
+    // Most identifiers will have position and the length can be found from the length of the identifier
     if (element.pos && element.name)
     {
         return pos >= element.pos && pos < element.pos + element.name.length;
     }
 
+    // Something else, doesn'match
     return false;
 }
 
+// Get the child elements of an element
 function getChildElements(element)
 {
+    // Architectures have members
     if (element.kind == "architecture")
         return element.members;
+
+    // Entity declarations have generic and port declarations
     if (element.kind == "entityDecl")
     {
         let children = [];
@@ -26,6 +34,8 @@ function getChildElements(element)
             children = children.concat(element.portDecls);
         return children;
     }
+
+    // Entity instances have assignments (which includes ports and parameters)
     if (element.kind == "entityInstance")
     {
         return element.assignments;
@@ -35,7 +45,7 @@ function getChildElements(element)
 // Given a tree of elements, find the element containing the specified position
 function findElementAtPosition(element, pos)
 {
-    // Check all elements of an array
+    // Is it an array, check them all
     if (Array.isArray(element))
     {
         for (let i=0; i<element.length; i++)
@@ -45,11 +55,11 @@ function findElementAtPosition(element, pos)
         }
     }
 
-    // Does this block element contain it?
+    // Is it within this element
     if (!doesContain(element, pos))
         return false;
 
-    // Check child elements
+    // If it's a block element, it might have children, recurse down.
     let children = getChildElements(element);
     if (children != null)
     {
@@ -57,28 +67,30 @@ function findElementAtPosition(element, pos)
         {
             let child = findElementAtPosition(children[i], pos);
             if (child)
-            {
                 return child;
-            }
         }
     }
 
-    // Check for entity instance type name
+    // If it's an entity instance, check its type
     if (element.kind == "entityInstance")
     {
         if (doesContain(element.type, pos))
             return element.type;
     }
 
+    // Not in a child, just return this element
     return element;
 }
 
+// Find an element by name
 function findElementByName(element, name)
 {
+    // Don't check reference types
     if (element.kind == "assignment")
         return null;
     if (element.kind == "entityTypeReference")
         return null;
+
     // Check all elements of an array
     if (Array.isArray(element))
     {
@@ -90,9 +102,11 @@ function findElementByName(element, name)
         }
     }
 
+    // Is it this element?
     if (element.name == name)
         return element;
 
+    // No, check child elements
     let children = getChildElements(element);
     if (children != null)
     {
@@ -104,6 +118,7 @@ function findElementByName(element, name)
         }
     }
 
+    // Not found
     return null;
 }
 
