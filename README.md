@@ -8,6 +8,7 @@ VHDL Wrangle can:
 
 * Convert VHDL entity declarations into instances
 * Convert VHDL port declarations into signals
+* Simple, convention driven Jump to Definition
 
 
 ## Usage
@@ -79,6 +80,20 @@ After:
 	signal s_reset : std_logic;
 	signal s_clken : std_logic;
 ```
+
+## Go To Definition
+
+VhdlWrangle includes a simple, configuration free VS Code definition provider.  It relies on a few simple conventions:
+
+1. The source file for an entity is always located in a file with the same name + ".vhd".
+2. The source file for an entity is located by searching the same directory as the current source file as well as all
+   workspace folders and their sub-folders.
+
+The implementation is deliberately simple, but also limited:
+
+1. Assumes one VHDL entity per file
+2. Doesn't support libraries/packages (only uses the entity name)
+3. Doesn't support functions or packages
 
 
 
